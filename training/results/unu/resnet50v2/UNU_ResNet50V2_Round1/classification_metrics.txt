@@ -1,0 +1,12 @@
+Precision: 0.8475
+Recall (Sensitivity): 0.9804
+F1-Score: 0.9091
+Sensitivity: 0.9804
+Specificity: 0.8235
+AUC: 0.9908
+Matthews Correlation Coefficient (MCC): 0.8140
+Cohen's Kappa: 0.8039
+Balanced Accuracy: 0.9020
+Jaccard Index (IoU): 0.8333
+Log Loss: 0.1716
+F0.5-Score: 0.8711

@@ -3,7 +3,7 @@ It has been stored on kaggle for all version.
 
 # ORIGINAL DATA
 
-The following link is for the original data that has not been tampered with in any way. ["https://kaggle.com](...pending upload)
+The following link is for the original data that has not been tampered with in any way. [""](Zenodo Link UTI Classification Dataset Original Untampered)
 
 # STRUCTURED DATA
 
@@ -18,7 +18,7 @@ training/ \
 
 # STRUCTURED AND SPLIT 65/25/10 ( Recommended Download )
 
-There is a link to be able to pull the exact cleaned, structured and split data for this project on kaggle using the link: ["https://kaggle.com](...pending upload)
+There is a link to be able to pull the exact cleaned, structured and split data for this project on kaggle using the link: ["https://zenodo.org/uploads/17449876"](Zenodo-Link-UTI-Classification-Dataset-Split)
 
 once you download the dataset, it has to be in the same folder name underneath data. if unsure, put the folder exactly where you see this README.md file.
 
