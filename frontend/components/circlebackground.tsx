@@ -107,7 +107,7 @@ const CircleBackground = ({
                     border-radius: 50%;
                     background: white;
                     border: 1px solid #57572E;
-                    transform: translate3d(-50%, -50%, 0);
+                    transform: translate(-50%, -50%);
                     animation-name: circleFloat;
                     animation-timing-function: ease-in-out;
                     animation-iteration-count: infinite;
@@ -121,13 +121,12 @@ const CircleBackground = ({
                 @keyframes circleFloat {
                     0%,
                     100% {
-                        transform: translate3d(-50%, -50%, 0);
+                        transform: translate(-50%, -50%);
                     }
                     50% {
-                        transform: translate3d(
+                        transform: translate(
                             calc(-50% + var(--tx)),
-                            calc(-50% + var(--ty)),
-                            0
+                            calc(-50% + var(--ty))
                         );
                     }
                 }
@@ -135,21 +134,19 @@ const CircleBackground = ({
                 @keyframes circleFloatAlt {
                     0%,
                     100% {
-                        transform: translate3d(-50%, -50%, 0) scale(1);
+                        transform: translate(-50%, -50%) scale(1);
                     }
                     40% {
-                        transform: translate3d(
+                        transform: translate(
                                 calc(-50% - calc(var(--tx) * 0.6)),
-                                calc(-50% - calc(var(--ty) * 0.6)),
-                                0
+                                calc(-50% - calc(var(--ty) * 0.6))
                             )
                             scale(1.05);
                     }
                     70% {
-                        transform: translate3d(
+                        transform: translate(
                                 calc(-50% + calc(var(--tx) * 0.8)),
-                                calc(-50% + calc(var(--ty) * 0.8)),
-                                0
+                                calc(-50% + calc(var(--ty) * 0.8))
                             )
                             scale(0.97);
                     }

@@ -2,10 +2,15 @@
 
 import CircleBackground from "@/components/circlebackground";
 import Navbar from "@/components/navbar";
-import { TypographyH1, TypographyP } from "@/components/typography";
+import PredictionDialog from "@/components/prediction/PredictionDialog";
+import { TypographyH1 } from "@/components/typography";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, Brain } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
+    const [isPredictionDialog, setPredictionDialog] = useState(true);
+
     return (
         <div className="relative min-h-screen bg-white font-sans overflow-hidden">
             <CircleBackground circleCount={130} />
@@ -22,14 +27,22 @@ export default function Home() {
                         </div>
 
                         <Button
+                            onClick={() => setPredictionDialog(true)}
                             variant={"rounded"}
-                            className="bg-[#7D7D42] hover:bg-[#a8a860] text-white justify-self-center duration-300"
+                            className=""
                         >
+                            <Brain />
                             Start Prediction
+                            <ArrowRight />
                         </Button>
                     </div>
                 </div>
             </div>
+
+            <PredictionDialog
+                setPredictionDialog={setPredictionDialog}
+                isPredictionDialog={isPredictionDialog}
+            />
         </div>
     );
 }
