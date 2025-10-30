@@ -1,12 +1,16 @@
 "use client";
 
 import CircleBackground from "@/components/circlebackground";
-import Navbar from "@/components/navbar";
 import PredictionDialog from "@/components/prediction/PredictionDialog";
-import { TypographyH1 } from "@/components/typography";
+import {
+    TypographyH1,
+    TypographyH2,
+    TypographyP,
+} from "@/components/typography";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain } from "lucide-react";
+import { ArrowDown, ArrowRight, Brain } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
     const [isPredictionDialog, setPredictionDialog] = useState(true);
@@ -14,12 +18,8 @@ export default function Home() {
     return (
         <div className="relative min-h-screen bg-white font-sans overflow-hidden">
             <CircleBackground circleCount={130} />
-            <div className="relative z-10">
-                <div className="absolute z-10 px-6 w-full">
-                    <Navbar />
-                </div>
-
-                <div className="content relative min-h-screen border-2 grid place-items-center">
+            <div className="relative grid justify-items-center">
+                <div className="content relative sm:min-h-screen sm:py-0 pt-50 pb-30 grid place-items-center w-[min(960px,100%)] mx-6">
                     <div className="grid gap-6">
                         <div className="">
                             <TypographyH1>UTI</TypographyH1>
@@ -35,6 +35,105 @@ export default function Home() {
                             Start Prediction
                             <ArrowRight />
                         </Button>
+                    </div>
+                </div>
+
+                <div className="relative grid w-[min(970px,100%)] mb-20 px-8">
+                    <div className="flex flex-col sm:flex-row sm:gap-10 gap-5">
+                        <div className="flex-1">
+                            <TypographyH2>What is UTI?</TypographyH2>
+                            <TypographyP>
+                                UTI, Urinary Tract Infection is a disease that
+                                affects the groin area. It can cause extreme
+                                pain when relieving pee through the bladder.
+                            </TypographyP>
+                        </div>
+
+                        <div className="flex-1 sm:mt-14 rounded-3xl border-10 border-[var(--lime-green)]/40 grid place-items-center">
+                            <Image
+                                src="/images/rbcs-13.jpg"
+                                alt=""
+                                height={600}
+                                width={600}
+                                className="rounded-xl object-cover"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 mt-14">
+                        <div>
+                            <TypographyH2>Prediction Process</TypographyH2>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-5 items-center">
+                            <div className="flex-1 rounded-md grid place-items-center">
+                                <Image
+                                    src="/image.jpg"
+                                    alt=""
+                                    height={600}
+                                    width={600}
+                                    className="rounded-md object-cover"
+                                />
+                            </div>
+
+                            <Button
+                                variant={"outline"}
+                                size={"icon"}
+                                className="rounded-full border-[var(--dark-lime)]"
+                            >
+                                <ArrowRight className="sm:block hidden text-[var(--dark-lime)]" />
+                                <ArrowDown className="sm:hidden block text-[var(--dark-lime)]" />
+                            </Button>
+                            <div className="flex-1 rounded-md grid place-items-center">
+                                <Image
+                                    src="/image.jpg"
+                                    alt=""
+                                    height={600}
+                                    width={600}
+                                    className="rounded-md object-cover"
+                                />
+                            </div>
+
+                            <Button
+                                variant={"outline"}
+                                size={"icon"}
+                                className="rounded-full border-[var(--dark-lime)]"
+                            >
+                                <ArrowRight className="sm:block hidden text-[var(--dark-lime)]" />
+                                <ArrowDown className="sm:hidden block text-[var(--dark-lime)]" />{" "}
+                            </Button>
+
+                            <div className="flex-1 rounded-md grid place-items-center">
+                                <Image
+                                    src="/image.jpg"
+                                    alt=""
+                                    height={600}
+                                    width={600}
+                                    className="rounded-md object-cover"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid gap-4 items-center mt-20 mb-40 px-8">
+                    <TypographyH2 className="text-center">
+                        Ready To Start? Start Predicting.
+                    </TypographyH2>
+
+                    <Button
+                        onClick={() => setPredictionDialog(true)}
+                        variant={"rounded"}
+                    >
+                        <Brain />
+                        Start Prediction
+                        <ArrowRight />
+                    </Button>
+                </div>
+
+                <div className="w-full grid bg-[var(--dark-lime)] text-xs text-white place-items-center">
+                    <div className="p-4">
+                        Copyrights @2025, all rights reserved.
                     </div>
                 </div>
             </div>
