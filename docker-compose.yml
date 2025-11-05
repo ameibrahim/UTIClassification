@@ -8,7 +8,7 @@ services:
     ports:
       - "7135:7135"
     volumes:
-      - .:/app
+      - ./api:/app
     environment:
       MODELS_DIR: /models
     restart: unless-stopped

@@ -52,6 +52,10 @@ def _pil_from_upload(upload: UploadFile) -> Image.Image:
     except Exception as exc:
         raise ValueError(f"Unable to decode uploaded image: {exc}") from exc
 
+@application.get("/health")
+def health():
+    return {"ok": True}
+
 @application.post("/predict/")
 async def post_results(
     modelInputFeatureSize: int = Form(...),
