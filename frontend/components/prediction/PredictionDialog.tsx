@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import {
     Dialog,
     DialogTitle,
@@ -24,101 +24,42 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { toast } from "sonner";
+import {
+    ProcessStatusValues,
+    usePredictionContext,
+} from "@/context/PredictionContext";
 
-type ProcessStatusType = "upload" | "predicting" | "error" | "results";
-const ProcessStatusValues = {
-    upload: "upload",
-    predicting: "predicting",
-    error: "error",
-    results: "results",
-};
+export default function PredictionDialogSet() {
 
-function PredictionDialog({
-    isPredictionDialog,
-    setPredictionDialog,
-}: {
-    isPredictionDialog: boolean;
-    setPredictionDialog: Dispatch<SetStateAction<boolean>>;
-}) {
-    const [processStatus, setProcessStatus] =
-        useState<ProcessStatusType>("upload");
-
-    const [isPredictionLoader, setIsPredictionLoader] = useState(false);
-    const [trigger, setTrigger] = useState(false);
-
-    useEffect(() => {
-        setProcessStatus("upload");
-    }, []);
-
-    function handleUploadDialogPredictButtonCallback() {
-        setProcessStatus("predicting");
-        setTrigger(true);
-    }
-
-    function handleClosePredictionEarly() {
-        // stopFetching()
-        toast.error("Prediction Cancelled Early");
-        setProcessStatus("upload");
-    }
-
-    function handlePredictionSuccess() {
-        toast.success("Prediction Finished");
-        setProcessStatus("results");
-    }
-
-    function handlePredictionError() {
-        toast.error("Error During Prediction");
-        setProcessStatus("error");
-    }
-
-    async function handleRetryPrediction() {
-        toast.error("Retrying Prediction");
-        setProcessStatus("error");
-    }
+    // These are all controlled by a context
+    // to be able to pass data around efficiently
+    // and seperate the UI into multiple components
+    // as well as keep the set in the layout for use
+    // in other pages.
 
     return (
         <>
-            {processStatus == ProcessStatusValues.upload && (
-                <UploadDialog
-                    open={isPredictionDialog}
-                    onOpenChange={setPredictionDialog}
-                    callback={handleUploadDialogPredictButtonCallback}
-                />
-            )}
-
-            {processStatus == ProcessStatusValues.predicting && (
-                <PredictingLoaderDialog
-                    trigger={trigger}
-                    handleCloseEarly={handleClosePredictionEarly}
-                    handleSuccess={handlePredictionSuccess}
-                    handleFailure={handlePredictionError}
-                />
-            )}
-
-            {processStatus == ProcessStatusValues.error && <ErrorDialog />}
-
-            {processStatus == ProcessStatusValues.results && (
-                <Results
-                    open={isPredictionDialog}
-                    onOpenChange={setPredictionDialog}
-                />
-            )}
+            <UploadDialog />
+            <PredictingLoaderDialog />
+            <ErrorDialog />
+            <ResultsDialog />
         </>
     );
 }
 
-function UploadDialog({
-    open,
-    onOpenChange,
-    callback,
-}: {
-    open: boolean;
-    onOpenChange: Dispatch<SetStateAction<boolean>>;
-    callback: () => void;
-}) {
+function UploadDialog() {
+    const {
+        processStatus,
+        handleSetProcessStatusOff,
+        handlePredictingImageChange,
+        startPrediction,
+    } = usePredictionContext();
+
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={processStatus == ProcessStatusValues.upload}
+            onOpenChange={handleSetProcessStatusOff}
+        >
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>UTI Classification</DialogTitle>
@@ -135,16 +76,19 @@ function UploadDialog({
                             <div className="">
                                 Choose an image file for prediction
                             </div>
-                            {/* <input
-                        className="border"
-                        id="upload-image"
-                        type="file"
-                    ></input> */}
+                            <input
+                                className="hidden"
+                                id="upload-image"
+                                type="file"
+                                onChange={handlePredictingImageChange}
+                            />
                         </Label>
                         <Button
                             className="justify-self-end px-10"
                             variant={"rounded"}
-                            onClick={callback}
+                            onClick={() => {
+                                startPrediction();
+                            }}
                         >
                             <ShinyText
                                 text="Predict"
@@ -160,226 +104,167 @@ function UploadDialog({
     );
 }
 
-function PredictingLoaderDialog({
-    handleCloseEarly,
-    handleSuccess,
-    handleFailure,
-    trigger,
-}: {
-    handleCloseEarly: () => void;
-    handleSuccess: () => void;
-    handleFailure: () => void;
-    trigger: boolean;
-}) {
-    // const [progress, setProgress] = React.useState(13);
-
-    // React.useEffect(() => {
-    //     const timer = setTimeout(() => setProgress(66), 500);
-    //     return () => clearTimeout(timer);
-    // }, []);
-
-    // GET FROM CONTEXT
-
-    useEffect(() => {
-        function loading() {
-            setTimeout(() => {
-                const random = Math.ceil(Math.random() * 10)
-                console.log(random);
-                if(random > 5) handleSuccess();
-                else handleFailure();
-            }, 3000);
-        }
-
-        if (trigger == true) {
-            loading();
-        }
-    }, [trigger]);
+function PredictingLoaderDialog() {
+    const { processStatus, handleClosePredictionEarly } =
+        usePredictionContext();
 
     return (
-        <>
-            <Dialog open={true}>
-                <DialogContent showCloseButton={false}>
-                    <DialogHeader>
-                        <DialogTitle>
-                            <ShinyText
-                                text="Predicting From Image"
-                                disabled={false}
-                                speed={7}
-                                className=""
-                                color="text-[var(--dark-lime)]"
-                            />
-                        </DialogTitle>
+        <Dialog open={processStatus === ProcessStatusValues.predicting}>
+            <DialogContent showCloseButton={false}>
+                <DialogHeader>
+                    <DialogTitle>
+                        <ShinyText
+                            text="Predicting From Image"
+                            disabled={false}
+                            speed={7}
+                            className=""
+                            color="text-[var(--dark-lime)]"
+                        />
+                    </DialogTitle>
 
-                        <div className="py-20 w-full grid place-items-center">
-                            <Item variant="default" className="gap-2">
-                                <ItemMedia>
-                                    <Spinner className="text-[var(--dark-lime)]" />
-                                </ItemMedia>
-                                <ItemContent>
-                                    <ShinyText
-                                        text="Predicting..."
-                                        disabled={false}
-                                        speed={5}
-                                        className=""
-                                        color="text-[var(--dark-lime)]"
-                                    />
-                                </ItemContent>
-                            </Item>
-                        </div>
-
-                        <div className="w-full flex justify-end">
-                            <Button
-                                onClick={handleCloseEarly}
-                                variant={"rounded"}
-                            >
-                                <BadgeX /> Cancel Early
-                            </Button>
-                        </div>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-
-            {/* <Progress
-                value={progress}
-                indicatorClassName="bg-[var(--dark-lime)]"
-                className="w-full h-0.5 bg-[var(--lime-green)]/30"
-            /> */}
-        </>
-    );
-}
-
-function ErrorDialog({}: {}) {
-    return (
-        <>
-            <Dialog open={true}>
-                <DialogContent
-                    showCloseButton={false}
-                    className="border-red-300"
-                >
-                    <DialogHeader>
-                        <DialogTitle className="text-red-500">
-                            Error Predicting
-                        </DialogTitle>
-
-                        <div className="py-20 w-full grid place-items-center">
-                            <Item variant="default" className="gap-2">
-                                <ItemMedia>
-                                    <OctagonAlert className="text-red-500 size-4" />
-                                </ItemMedia>
-                                <ItemContent className="text-red-500">
-                                    Error During Prediction
-                                </ItemContent>
-                            </Item>
-                        </div>
-
-                        <div className="w-full flex justify-between">
-                            <Button
-                                variant={"rounded"}
-                                className="bg-yellow-400 hover:bg-yellow-400"
-                            >
-                                <X className="text-yellow-200" />
+                    <div className="py-20 w-full grid place-items-center">
+                        <Item variant="default" className="gap-2">
+                            <ItemMedia>
+                                <Spinner className="text-[var(--dark-lime)]" />
+                            </ItemMedia>
+                            <ItemContent>
                                 <ShinyText
-                                    text="Cancel"
+                                    text="Predicting..."
                                     disabled={false}
                                     speed={5}
                                     className=""
-                                    color="text-yellow-200"
+                                    color="text-[var(--dark-lime)]"
                                 />
-                            </Button>
+                            </ItemContent>
+                        </Item>
+                    </div>
 
-                            <Button
-                                variant={"rounded"}
-                                className="bg-red-500 hover:bg-red-400"
-                            >
-                                <IterationCw className="text-red-100" />
-                                <ShinyText
-                                    text="Retry"
-                                    disabled={false}
-                                    speed={3}
-                                    className=""
-                                    color="text-red-100"
-                                />
-                            </Button>
-                        </div>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-
-            {/* <Progress
-                value={progress}
-                indicatorClassName="bg-[var(--dark-lime)]"
-                className="w-full h-0.5 bg-[var(--lime-green)]/30"
-            /> */}
-        </>
+                    <div className="w-full flex justify-end">
+                        <Button
+                            onClick={handleClosePredictionEarly}
+                            variant={"rounded"}
+                        >
+                            <BadgeX /> Cancel Early
+                        </Button>
+                    </div>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
     );
 }
 
-function Results({
-    open,
-    onOpenChange,
-}: {
-    open: boolean;
-    onOpenChange: Dispatch<SetStateAction<boolean>>;
-}) {
+function ErrorDialog() {
+    const { processStatus, handleClosePredictionEarly, handleRetryPrediction } =
+        usePredictionContext();
+
     return (
-        <>
-            <Dialog open={open}>
-                <DialogContent showCloseButton={false}>
-                    <DialogHeader>
-                        <DialogTitle className="text-[var(--dark-lime)]">
-                            Results
-                        </DialogTitle>
+        <Dialog open={processStatus == ProcessStatusValues.error}>
+            <DialogContent showCloseButton={false} className="border-red-300">
+                <DialogHeader>
+                    <DialogTitle className="text-red-500">
+                        Error Predicting
+                    </DialogTitle>
 
-                        <div className="grid justify-items-start">
-                            <ResultListItem
-                                title="Predicted UTI Class"
-                                value="RBC"
+                    <div className="py-20 w-full grid place-items-center">
+                        <Item variant="default" className="gap-2">
+                            <ItemMedia>
+                                <OctagonAlert className="text-red-500 size-4" />
+                            </ItemMedia>
+                            <ItemContent className="text-red-500">
+                                Error During Prediction
+                            </ItemContent>
+                        </Item>
+                    </div>
+
+                    <div className="w-full flex justify-between">
+                        <Button
+                            variant={"rounded"}
+                            className="bg-yellow-400 hover:bg-yellow-400"
+                            onClick={handleClosePredictionEarly}
+                        >
+                            <X className="text-yellow-200" />
+                            <ShinyText
+                                text="Cancel"
+                                disabled={false}
+                                speed={5}
+                                className=""
+                                color="text-yellow-200"
                             />
-                            <ResultListItem title="Accuracy" value="99%" />
-                            <ResultListItem
-                                title="Model Used"
-                                value="UTI-ResNet50V2.keras"
+                        </Button>
+
+                        <Button
+                            variant={"rounded"}
+                            className="bg-red-500 hover:bg-red-400"
+                            onClick={() => {
+                                void handleRetryPrediction();
+                            }}
+                        >
+                            <IterationCw className="text-red-100" />
+                            <ShinyText
+                                text="Retry"
+                                disabled={false}
+                                speed={3}
+                                className=""
+                                color="text-red-100"
                             />
-                            <ResultListItem
-                                title="Inference Time"
-                                value="3.5s"
-                            />
-                        </div>
+                        </Button>
+                    </div>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
-                        <div className="my-2 text-xs font-bold text-[var(--dark-lime)]">
-                            GradCam Shots
-                        </div>
+function ResultsDialog() {
+    const { processStatus, handleSetProcessStatusOff } = usePredictionContext();
+    return (
+        <Dialog open={processStatus == ProcessStatusValues.results}>
+            <DialogContent showCloseButton={false}>
+                <DialogHeader>
+                    <DialogTitle className="text-[var(--dark-lime)]">
+                        Results
+                    </DialogTitle>
 
-                        <div className="flex gap-2 mb-2">
-                            <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                                <ArrowUpRight className="text-[var(--lime-green)]" />
-                            </div>
-                            <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                                <ArrowUpRight className="text-[var(--lime-green)]" />
-                            </div>
-                            <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                                <ArrowUpRight className="text-[var(--lime-green)]" />
-                            </div>
-                        </div>
+                    <div className="grid justify-items-start">
+                        <ResultListItem
+                            title="Predicted UTI Class"
+                            value="RBC"
+                        />
+                        <ResultListItem title="Accuracy" value="99%" />
+                        <ResultListItem
+                            title="Model Used"
+                            value="UTI-ResNet50V2.keras"
+                        />
+                        <ResultListItem title="Inference Time" value="3.5s" />
+                    </div>
 
-                        <div className="w-full flex justify-end">
-                            <Button
-                                onClick={() => onOpenChange(false)}
-                                variant={"rounded"}
-                            >
-                                Done Review
-                            </Button>
-                        </div>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
+                    <div className="my-2 text-xs font-bold text-[var(--dark-lime)]">
+                        GradCam Shots
+                    </div>
 
-            {/* <Progress
-                value={progress}
-                indicatorClassName="bg-[var(--dark-lime)]"
-                className="w-full h-0.5 bg-[var(--lime-green)]/30"
-            /> */}
-        </>
+                    <div className="flex gap-2 mb-2">
+                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                            <ArrowUpRight className="text-[var(--lime-green)]" />
+                        </div>
+                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                            <ArrowUpRight className="text-[var(--lime-green)]" />
+                        </div>
+                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                            <ArrowUpRight className="text-[var(--lime-green)]" />
+                        </div>
+                    </div>
+
+                    <div className="w-full flex justify-end">
+                        <Button
+                            onClick={handleSetProcessStatusOff}
+                            variant={"rounded"}
+                        >
+                            Done Review
+                        </Button>
+                    </div>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
     );
 }
 
@@ -448,5 +333,3 @@ function ImageReview({
         </>
     );
 }
-
-export default PredictionDialog;

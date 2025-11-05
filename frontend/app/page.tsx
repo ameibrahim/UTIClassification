@@ -1,7 +1,6 @@
 "use client";
 
 import CircleBackground from "@/components/circlebackground";
-import PredictionDialog from "@/components/prediction/PredictionDialog";
 import {
     TypographyH1,
     TypographyH2,
@@ -9,11 +8,11 @@ import {
 } from "@/components/typography";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowRight, Brain } from "lucide-react";
-import { useState } from "react";
 import Image from "next/image";
+import { usePredictionContext } from "@/context/PredictionContext";
 
 export default function Home() {
-    const [isPredictionDialog, setPredictionDialog] = useState(true);
+    const { handleSetProcessStatusOn } = usePredictionContext();
 
     return (
         <div className="relative min-h-screen bg-white font-sans overflow-hidden">
@@ -27,7 +26,7 @@ export default function Home() {
                         </div>
 
                         <Button
-                            onClick={() => setPredictionDialog(true)}
+                            onClick={handleSetProcessStatusOn}
                             variant={"rounded"}
                             className=""
                         >
@@ -122,7 +121,7 @@ export default function Home() {
                     </TypographyH2>
 
                     <Button
-                        onClick={() => setPredictionDialog(true)}
+                        onClick={handleSetProcessStatusOn}
                         variant={"rounded"}
                     >
                         <Brain />
@@ -137,11 +136,6 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-
-            <PredictionDialog
-                setPredictionDialog={setPredictionDialog}
-                isPredictionDialog={isPredictionDialog}
-            />
         </div>
     );
 }
