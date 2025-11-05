@@ -1,95 +1,102 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
 import os
 from pathlib import Path
 from typing import Optional
+from io import BytesIO
+from PIL import Image
 
 from prediction import (
-    load_image_from_file,
-    load_image_from_url,
+    load_image_from_url,       # keep if you still want URL fallback
     predict_with_model_file,
 )
 
-UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", "./data/uploads"))
-MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "./data/models"))
+MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "./models"))
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)  # Set to DEBUG for more verbosity
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create FastAPI instance
 application = FastAPI()
 
-# Set up CORS
 application.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can specify your domain here
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Logging Middleware
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        logger.info(f"Request: {request.method} {request.url}")
+        logger.info("Request: %s %s", request.method, request.url)
         response = await call_next(request)
-        logger.info(f"Response: {response.status_code}")
+        logger.info("Response: %s", response.status_code)
         return response
 
 application.add_middleware(LoggingMiddleware)
 
-@application.get("/predict/")
-async def get_results(
-    modelInputFeatureSize: int,
-    modelFilename: str,
-    imageName: Optional[str] = None,
-    imageUrl: Optional[str] = None,
+def _pil_from_upload(upload: UploadFile) -> Image.Image:
+    # Basic content-type guard (optional)
+    if upload.content_type and not upload.content_type.startswith("image/"):
+        raise ValueError(f"Uploaded file is not an image (content-type={upload.content_type})")
+    # Read into memory and decode with PIL
+    data = upload.file.read()  # UploadFile.file is a SpooledTemporaryFile
+    if not data:
+        raise ValueError("Uploaded image is empty.")
+    try:
+        img = Image.open(BytesIO(data))
+        img.load()  # force read to catch truncated files early
+        return img
+    except Exception as exc:
+        raise ValueError(f"Unable to decode uploaded image: {exc}") from exc
+
+@application.post("/predict/")
+async def post_results(
+    modelInputFeatureSize: int = Form(...),
+    modelFilename: str = Form(...),
+    image: Optional[UploadFile] = File(None),     # form-data file field: "image"
+    imageUrl: Optional[str] = Form(None),         # optional: still allow URL in form-data
 ):
-    
-    ### This api takes in a modelfilename so that you can
-    ##  generically call in the UNU and UTI model types
-    #   It returns the classnames in number format
+    """
+    Accepts multipart/form-data:
+      - modelInputFeatureSize: int (Form)
+      - modelFilename: str (Form)
+      - image: file (File)   <-- preferred path
+      - imageUrl: str (Form) <-- optional fallback
+    Returns numeric class prediction(s).
+    """
 
-    ### The imageName works-ish, but you will need to setup
-    ##  dockers shared volumes and remove the ./ on lines 15 & 16
-    #   this will let you have these files in both places.
-
-    ### The recommended route is to share an imageURL
-    ##  The frontend exposes the api/uploads route for images
-    #   It then gets the domain name and joins it.
-
-
-    if not imageName and not imageUrl:
+    if image is None and not imageUrl:
         raise HTTPException(
             status_code=400,
-            detail="Either imageName or imageUrl must be provided.",
+            detail="Provide an image file (form-data 'image') or an imageUrl (form field).",
         )
 
     try:
-        if imageUrl:
-            logger.info("Fetching image from URL: %s", imageUrl)
-            img = load_image_from_url(imageUrl)
+        # Load the image
+        if image is not None:
+            logger.info("Loading image from uploaded file: %s", image.filename)
+            img = _pil_from_upload(image)
         else:
-            assert imageName is not None
-            image_path = UPLOADS_DIR / imageName
-            logger.info("Loading image from path: %s", image_path)
-            img = load_image_from_file(image_path)
+            logger.info("Fetching image from URL: %s", imageUrl)
+            img = load_image_from_url(imageUrl)  # your existing helper
 
+        # Resolve model
         model_path = MODELS_DIR / modelFilename
         logger.info("Using model file: %s", model_path)
-        result = predict_with_model_file(img, model_path, modelInputFeatureSize)
 
+        # Run prediction
+        result = predict_with_model_file(img, model_path, modelInputFeatureSize)
         return {"classification": result}
 
     except ValueError as exc:
         logger.error("Validation error: %s", exc)
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except Exception as e:
-        logger.error("Error occurred while processing: %s", e)
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    except Exception as exc:
+        logger.error("Error occurred while processing: %s", exc)
+        raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 if __name__ == "__main__":
     import uvicorn

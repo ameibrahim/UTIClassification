@@ -10,3 +10,4 @@ uvicorn
 flask
 flask_cors
 requests
+python-multipart
