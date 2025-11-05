@@ -65,14 +65,14 @@ export default function Home() {
                             <TypographyH2>Prediction Process</TypographyH2>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-5 items-center">
-                            <div className="flex-1 rounded-md grid place-items-center">
+                        <div className="flex flex-col sm:flex-row gap-3 items-center">
+                            <div className="flex-1 relative bg-white rounded-md grid place-items-center border-2 sm:h-35 border-[var(--lime-green)] overflow-hidden">
                                 <Image
-                                    src="/image.jpg"
+                                    src="/images/dialog1.png"
                                     alt=""
                                     height={600}
                                     width={600}
-                                    className="rounded-md object-cover"
+                                    className="rounded-md object-contain"
                                 />
                             </div>
 
@@ -84,13 +84,13 @@ export default function Home() {
                                 <ArrowRight className="sm:block hidden text-[var(--dark-lime)]" />
                                 <ArrowDown className="sm:hidden block text-[var(--dark-lime)]" />
                             </Button>
-                            <div className="flex-1 rounded-md grid place-items-center">
+                            <div className="relative flex-1 rounded-md grid place-items-center border-2 h-35 border-[var(--lime-green)] overflow-hidden">
                                 <Image
                                     src="/image.jpg"
                                     alt=""
-                                    height={600}
+                                    height={300}
                                     width={600}
-                                    className="rounded-md object-cover"
+                                    className="rounded-md object-contain"
                                 />
                             </div>
 
@@ -103,13 +103,13 @@ export default function Home() {
                                 <ArrowDown className="sm:hidden block text-[var(--dark-lime)]" />{" "}
                             </Button>
 
-                            <div className="flex-1 rounded-md grid place-items-center">
+                            <div className="relative flex-1 rounded-md grid place-items-center border-2 h-35 border-[var(--lime-green)] overflow-hidden">
                                 <Image
                                     src="/image.jpg"
                                     alt=""
-                                    height={600}
+                                    height={300}
                                     width={600}
-                                    className="rounded-md object-cover"
+                                    className="rounded-md object-contain"
                                 />
                             </div>
                         </div>
