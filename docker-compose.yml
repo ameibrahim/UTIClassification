@@ -10,5 +10,5 @@ services:
     volumes:
       - ./api:/app
     environment:
-      MODELS_DIR: /models
+      MODELS_DIR: /app/models
     restart: unless-stopped
