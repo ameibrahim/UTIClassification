@@ -282,7 +282,7 @@ function ResultListItem({ title, value }: { title: string; value: string }) {
     );
 }
 
-function ImageReview({
+export function ImageReview({
     open,
     onOpenChange,
 }: {
