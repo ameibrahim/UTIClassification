@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
 export async function GET(
-    // _: NextRequest,
-    { params }: { params: Promise<{ image: string }> }
+    _req: NextRequest,
+    { params }: { params: { image: string } }
 ) {
-
-    const { image } = await params;
+    const { image } = params;
     const imagePath = path.join(process.cwd(), "uploads", image);
 
     if (!fs.existsSync(imagePath)) {

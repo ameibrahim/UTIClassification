@@ -29,7 +29,6 @@ def predict_with_model_file(source_image: Image.Image, model_path: Path, size: i
 
 def predict_image(model, source_image: Image.Image, size: int) -> Dict[str, object]:
     """Run inference and return class probabilities."""
-    labels = {0: "acne", 1: "chickenpox", 2: "monkeypox", 3: "non-skin", 4: "normal"}
     preprocessed_image = preprocess_image(source_image, size)
 
     logger.info("Preprocessed image shape: %s", preprocessed_image.shape)
@@ -37,12 +36,11 @@ def predict_image(model, source_image: Image.Image, size: int) -> Dict[str, obje
 
     prediction = model.predict(preprocessed_image)
     max_prob = float(np.max(prediction[0]))
-    predicted_class = labels[np.argmax(prediction[0])]
-    class_probabilities = {labels[i]: float(round(prob * 100, 2)) for i, prob in enumerate(prediction[0])}
+    class_probabilities = {i: float(round(prob * 100, 2)) for i, prob in enumerate(prediction[0])}
 
     return {
         "max_prob": max_prob,
-        "predicted_class": predicted_class,
+        "predicted_class": int(np.argmax(prediction[0])),
         "class_probabilities": class_probabilities,
     }
 

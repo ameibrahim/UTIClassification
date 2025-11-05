@@ -1,3 +1,5 @@
+"use client";
+
 import useFileUpload from "@/hooks/useFileUpload";
 import React, { useEffect } from "react";
 import {

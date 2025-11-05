@@ -12,10 +12,8 @@ from prediction import (
     predict_with_model_file,
 )
 
-UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", "/data/uploads"))
-MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "/data/models"))
-UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-MODELS_DIR.mkdir(parents=True, exist_ok=True)
+UPLOADS_DIR = Path(os.getenv("UPLOADS_DIR", "./data/uploads"))
+MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "./data/models"))
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)  # Set to DEBUG for more verbosity
@@ -50,6 +48,20 @@ async def get_results(
     imageName: Optional[str] = None,
     imageUrl: Optional[str] = None,
 ):
+    
+    ### This api takes in a modelfilename so that you can
+    ##  generically call in the UNU and UTI model types
+    #   It returns the classnames in number format
+
+    ### The imageName works-ish, but you will need to setup
+    ##  dockers shared volumes and remove the ./ on lines 15 & 16
+    #   this will let you have these files in both places.
+
+    ### The recommended route is to share an imageURL
+    ##  The frontend exposes the api/uploads route for images
+    #   It then gets the domain name and joins it.
+
+
     if not imageName and not imageUrl:
         raise HTTPException(
             status_code=400,
