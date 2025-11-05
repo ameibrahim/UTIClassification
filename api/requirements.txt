@@ -1,0 +1,13 @@
+tensorflow==2.18.0
+numpy
+h5py>=3.10.0
+pillow
+scikit-image
+scikit-learn
+joblib
+fastapi
+uvicorn
+flask
+flask_cors
+requests
+python-multipart
