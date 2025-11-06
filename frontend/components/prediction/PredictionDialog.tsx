@@ -28,9 +28,9 @@ import {
     ProcessStatusValues,
     usePredictionContext,
 } from "@/context/PredictionContext";
+import { Separator } from "../ui/separator";
 
 export default function PredictionDialogSet() {
-
     // These are all controlled by a context
     // to be able to pass data around efficiently
     // and seperate the UI into multiple components
@@ -57,7 +57,7 @@ function UploadDialog() {
 
     return (
         <Dialog
-            open={processStatus == ProcessStatusValues.upload}
+            open={processStatus === ProcessStatusValues.upload}
             onOpenChange={handleSetProcessStatusOff}
         >
             <DialogContent>
@@ -215,46 +215,163 @@ function ErrorDialog() {
     );
 }
 
+const UNUCLASSNAMES = {
+    "0": "Non UTI",
+    "1": "UTI",
+    "2": "Error",
+};
+
+const UTICLASSNAMES = {
+    "0": "Fungi",
+    "1": "PSS",
+    "2": "RBC",
+};
+
+function turnIntoPercentage(decimal: number) {
+    const clamped = Math.max(0, Math.min(1, decimal));
+    return `${(clamped * 100).toFixed(2)}%`;
+}
+
 function ResultsDialog() {
-    const { processStatus, handleSetProcessStatusOff } = usePredictionContext();
+    const {
+        processStatus,
+        handleSetProcessStatusOff,
+        unuPredictionResult,
+        utiPredictionResult,
+        unuModelFileName,
+        utiModelFileName,
+    } = usePredictionContext();
+
     return (
-        <Dialog open={processStatus == ProcessStatusValues.results}>
+        <Dialog
+            open={
+                processStatus == ProcessStatusValues.results ||
+                processStatus == ProcessStatusValues.predictinguti
+            }
+        >
             <DialogContent showCloseButton={false}>
                 <DialogHeader>
                     <DialogTitle className="text-[var(--dark-lime)]">
                         Results
                     </DialogTitle>
 
-                    <div className="grid justify-items-start">
-                        <ResultListItem
-                            title="Predicted UTI Class"
-                            value="RBC"
-                        />
-                        <ResultListItem title="Accuracy" value="99%" />
-                        <ResultListItem
-                            title="Model Used"
-                            value="UTI-ResNet50V2.keras"
-                        />
-                        <ResultListItem title="Inference Time" value="3.5s" />
-                    </div>
+                    {unuPredictionResult && (
+                        <div>
+                            <div className="text-xs underline underline-offset-4 mb-4 font-medium text-[var(--dark-lime)]">
+                                Binary Classification
+                            </div>
 
-                    <div className="my-2 text-xs font-bold text-[var(--dark-lime)]">
-                        GradCam Shots
-                    </div>
+                            <div className="border-1 py-1 rounded-md">
+                                <div className="grid justify-items-start">
+                                    <ResultListItem
+                                        title="Predicted Class"
+                                        value={
+                                            UNUCLASSNAMES[
+                                                unuPredictionResult
+                                                    .classification
+                                                    .predicted_class
+                                            ]
+                                        }
+                                    />
+                                    <Separator />
+                                    <ResultListItem
+                                        title="Accuracy"
+                                        value={turnIntoPercentage(
+                                            unuPredictionResult.classification
+                                                .max_prob
+                                        )}
+                                    />
+                                    <Separator />
 
-                    <div className="flex gap-2 mb-2">
-                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                            <ArrowUpRight className="text-[var(--lime-green)]" />
-                        </div>
-                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                            <ArrowUpRight className="text-[var(--lime-green)]" />
-                        </div>
-                        <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
-                            <ArrowUpRight className="text-[var(--lime-green)]" />
-                        </div>
-                    </div>
+                                    <ResultListItem
+                                        title="Model Used"
+                                        value={unuModelFileName}
+                                    />
+                                    <Separator />
 
-                    <div className="w-full flex justify-end">
+                                    <ResultListItem
+                                        title="Inference Time"
+                                        value="3.5s"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {unuPredictionResult && !utiPredictionResult && (
+                        <div className="p-4 w-full grid place-items-center">
+                            <Item variant="default" className="gap-2">
+                                <ItemMedia>
+                                    <Spinner className="text-[var(--dark-lime)]" />
+                                </ItemMedia>
+                                <ItemContent>
+                                    <ShinyText
+                                        text="Performing Deeper Classification..."
+                                        disabled={false}
+                                        speed={5}
+                                        className=""
+                                        color="text-[var(--dark-lime)]"
+                                    />
+                                </ItemContent>
+                            </Item>
+                        </div>
+                    )}
+
+                    {utiPredictionResult && (
+                        <div>
+                            <div className="text-xs underline underline-offset-4 mb-4 font-medium text-[var(--dark-lime)]">
+                                UTI Classification
+                            </div>
+                            <div className="grid justify-items-start border-1 py-1 rounded-md">
+                                <ResultListItem
+                                    title="Predicted UTI Class"
+                                    value={
+                                        UTICLASSNAMES[
+                                            utiPredictionResult.classification
+                                                .predicted_class
+                                        ]
+                                    }
+                                />
+                                <Separator />
+                                <ResultListItem
+                                    title="Accuracy"
+                                    value={turnIntoPercentage(
+                                        utiPredictionResult.classification
+                                            .max_prob
+                                    )}
+                                />
+                                <Separator />
+                                <ResultListItem
+                                    title="Model Used"
+                                    value={utiModelFileName}
+                                />
+                                <Separator />
+
+                                <ResultListItem
+                                    title="Inference Time"
+                                    value="3.5s"
+                                />
+                            </div>
+
+                            {/* <div className="my-2 text-xs font-bold text-[var(--dark-lime)]">
+                                GradCam Shots
+                            </div>
+
+                            <div className="flex gap-2 mb-2">
+                                <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                                    <ArrowUpRight className="text-[var(--lime-green)]" />
+                                </div>
+                                <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                                    <ArrowUpRight className="text-[var(--lime-green)]" />
+                                </div>
+                                <div className="h-30 w-30 border-2 border-[var(--lime-green)] rounded-md flex justify-center items-center">
+                                    <ArrowUpRight className="text-[var(--lime-green)]" />
+                                </div>
+                            </div> */}
+                        </div>
+                    )}
+
+                    <div className="w-full flex justify-end mt-2">
                         <Button
                             onClick={handleSetProcessStatusOff}
                             variant={"rounded"}
@@ -268,14 +385,20 @@ function ResultsDialog() {
     );
 }
 
-function ResultListItem({ title, value }: { title: string; value: string }) {
+function ResultListItem({
+    title,
+    value,
+}: {
+    title: string | number;
+    value: string | number;
+}) {
     return (
-        <Item variant="default" className="gap-2 p-0">
+        <Item variant="default" className="gap-0 p-0 text-xs">
             <ItemMedia>
                 <Dot className="text-[var(--dark-lime)]" />
             </ItemMedia>
-            <ItemContent>{title} - </ItemContent>
-            <ItemContent className="text-[var(--lime-green)] font-bold">
+            <ItemContent>{title} : </ItemContent>
+            <ItemContent className="ml-1 text-[var(--lime-green)] font-bold">
                 {value}
             </ItemContent>
         </Item>

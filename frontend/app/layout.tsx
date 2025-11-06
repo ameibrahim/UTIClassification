@@ -37,9 +37,7 @@ export default function RootLayout({
                     {children}
                     <Toaster position="top-center" />
 
-                    <PredictionProvider>
-                        <PredictionDialogSet />
-                    </PredictionProvider>
+                    <PredictionDialogSet />
                 </PredictionProvider>
             </body>
         </html>

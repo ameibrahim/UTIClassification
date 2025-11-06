@@ -9,12 +9,14 @@ import {
     useState,
     useCallback,
     useMemo,
+    useRef,
 } from "react";
 import { toast } from "sonner";
 
 export type ProcessStatusType =
     | "upload"
     | "predicting"
+    | "predictinguti"
     | "error"
     | "results"
     | "off";
@@ -24,6 +26,17 @@ export const ProcessStatusValues = {
     error: "error",
     results: "results",
     off: "off",
+    predictinguti: "predictinguti",
+};
+
+type PredictionResponse = {
+    classification: {
+        predicted_class: "0" | "1" | "2";
+        max_prob: number;
+        class_probabilities: Record<string, number>;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
 };
 
 type PredictionContextValue = {
@@ -32,6 +45,12 @@ type PredictionContextValue = {
     imageURL?: string;
     isUploading: boolean;
     processStatus: ProcessStatusType;
+    unuModelFileName: string;
+    setUNUModelFileName: (filename: string) => void;
+    utiModelFileName: string;
+    setUTIModelFileName: (filename: string) => void;
+    unuPredictionResult: PredictionResponse | null;
+    utiPredictionResult: PredictionResponse | null;
     handleUploadDialogPredictButtonCallback: () => void;
     handleClosePredictionEarly: () => void;
     handlePredictionSuccess: () => void;
@@ -58,12 +77,23 @@ export function usePredictionContext() {
 export function PredictionProvider({ children }: { children: ReactNode }) {
     const [imageURL, setImageURL] = useState<string | undefined>(undefined);
     const [image, setImage] = useState<File | undefined>(undefined);
-    const { uploadFile, isUploading } = useFileUpload();
+    const { isUploading } = useFileUpload();
     const [processStatus, setProcessStatus] =
-        useState<ProcessStatusType>("upload");
+        useState<ProcessStatusType>("off");
+    const [unuModelFileNameState, setUNUModelFileNameState] = useState<string>(
+        "UNU_ResNet101V2_Round5.keras"
+    );
+    const [utiModelFileNameState, setUTIModelFileNameState] = useState<string>(
+        "UTI_VGG19_Round4.keras"
+    );
+    const [unuPredictionResult, setUNUPredictionResult] =
+        useState<PredictionResponse | null>(null);
+    const [utiPredictionResult, setUTIPredictionResult] =
+        useState<PredictionResponse | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
-        setProcessStatus("upload");
+        setProcessStatus("off");
     }, []);
 
     const handlePredictingImageChange = useCallback(
@@ -87,10 +117,14 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
 
     const handleSetProcessStatusOff = useCallback(() => {
         setProcessStatus("off");
+        setUNUPredictionResult(null);
+        setUTIPredictionResult(null);
     }, []);
 
     const handleSetProcessStatusOn = useCallback(() => {
         setProcessStatus("upload");
+        setUNUPredictionResult(null);
+        setUTIPredictionResult(null);
     }, []);
 
     const handleUploadDialogPredictButtonCallback = useCallback(() => {
@@ -98,8 +132,14 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const handleClosePredictionEarly = useCallback(() => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
         toast.error("Prediction Cancelled Early");
         setProcessStatus("upload");
+        setUNUPredictionResult(null);
+        setUTIPredictionResult(null);
     }, []);
 
     const handlePredictionSuccess = useCallback(() => {
@@ -113,6 +153,7 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const startPrediction = useCallback(async () => {
+        let controller: AbortController | null = null;
         try {
             if (!image) {
                 toast.error("No image selected");
@@ -120,39 +161,85 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            const result = await uploadFile(image);
-            console.log("upload result: ", result);
-
-            const fileName = result.split("/uploads/")[1];
-
-            const prediction = await fetch("/api/predict", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ fileName }),
-            });
-
-            const predictionResults = JSON.parse(
-                await prediction.text()
-            ).classification;
-            console.log("predictionResults: ", predictionResults);
-
-            if (predictionResults) {
-                handlePredictionSuccess();
-            } else {
-                handlePredictionError();
+            if (!unuModelFileNameState || !utiModelFileNameState) {
+                toast.error("Select a model before predicting");
+                setProcessStatus("upload");
+                return;
             }
+
+            setProcessStatus("predicting");
+
+            abortControllerRef.current?.abort();
+            controller = new AbortController();
+            abortControllerRef.current = controller;
+            const activeController = controller;
+
+            setUNUPredictionResult(null);
+            setUTIPredictionResult(null);
+
+            const sendPrediction = async (
+                modelFileName: string
+            ): Promise<PredictionResponse> => {
+                const formData = new FormData();
+                formData.append("image", image);
+                formData.append("modelInputFeatureSize", "224");
+                formData.append("modelFilename", modelFileName);
+
+                const response = await fetch(
+                    "https://api.uticlassification.app/predict/",
+                    {
+                        method: "POST",
+                        body: formData,
+                        signal: activeController.signal,
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Prediction request failed with status ${response.status}`
+                    );
+                }
+
+                return (await response.json()) as PredictionResponse;
+            };
+
+            const unuResult = await sendPrediction(unuModelFileNameState);
+            setUNUPredictionResult(unuResult);
+
+            console.log("unuResult: ", unuResult);
+
+            const predictedClass =
+                unuResult.classification?.predicted_class ?? null;
+
+            if (Number(predictedClass) == 1) {
+                toast.success("Image is UTI, running deeper classification");
+                setProcessStatus("predictinguti")
+                const utiResult = await sendPrediction(utiModelFileNameState);
+                setUTIPredictionResult(utiResult);
+                console.log("utiResult: ", utiResult);
+            } else {
+                setUTIPredictionResult(null);
+            }
+
+            handlePredictionSuccess();
         } catch (error) {
+            if (error instanceof DOMException && error.name === "AbortError") {
+                console.log("Prediction request aborted");
+                return;
+            }
             console.error(error);
             handlePredictionError();
+        } finally {
+            if (controller && abortControllerRef.current === controller) {
+                abortControllerRef.current = null;
+            }
         }
     }, [
         image,
-        uploadFile,
+        unuModelFileNameState,
+        utiModelFileNameState,
         handlePredictionError,
         handlePredictionSuccess,
-        setProcessStatus,
     ]);
 
     const handleRetryPrediction = useCallback(async () => {
@@ -167,6 +254,12 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             imageURL,
             isUploading,
             processStatus,
+            unuModelFileName: unuModelFileNameState,
+            setUNUModelFileName: setUNUModelFileNameState,
+            utiModelFileName: utiModelFileNameState,
+            setUTIModelFileName: setUTIModelFileNameState,
+            unuPredictionResult,
+            utiPredictionResult,
             handleUploadDialogPredictButtonCallback,
             handleClosePredictionEarly,
             handlePredictionSuccess,
@@ -181,6 +274,10 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             imageURL,
             isUploading,
             processStatus,
+            unuModelFileNameState,
+            utiModelFileNameState,
+            unuPredictionResult,
+            utiPredictionResult,
             handleUploadDialogPredictButtonCallback,
             handleClosePredictionEarly,
             handlePredictionSuccess,
