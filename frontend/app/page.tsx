@@ -16,7 +16,11 @@ export default function Home() {
 
     return (
         <div className="relative min-h-screen bg-white font-sans overflow-hidden">
-            <CircleBackground circleCount={130} />
+            <CircleBackground
+                circleCount={150}
+                seed={11}
+                className="opacity-80"
+            />
             <div className="relative grid justify-items-center">
                 <div className="content relative sm:min-h-screen sm:py-0 pt-50 pb-30 grid place-items-center w-[min(960px,100%)] mx-6">
                     <div className="grid gap-6">
@@ -60,15 +64,6 @@ export default function Home() {
                                 when little urine is produced. Untreated
                                 infections can spread to the kidneys, leading to
                                 fever, chills, and lower back pain.
-                            </TypographyP>
-                            <TypographyP>
-                                Risk factors include dehydration, sexual
-                                activity, diabetes, pregnancy, catheter use, and
-                                anatomical differences that shorten the urethra.
-                                Early detection plus a targeted antibiotic
-                                regimen typically resolves symptoms quickly, so
-                                prompt screening is encouraged whenever warning
-                                signs appear.
                             </TypographyP>
                         </div>
 
@@ -152,12 +147,6 @@ export default function Home() {
                         Start Prediction
                         <ArrowRight />
                     </Button>
-                </div>
-
-                <div className="w-full grid bg-[var(--dark-lime)] text-xs text-white place-items-center">
-                    <div className="p-4">
-                        Copyrights @ 2025, all rights reserved.
-                    </div>
                 </div>
             </div>
         </div>
