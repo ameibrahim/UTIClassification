@@ -6,8 +6,8 @@
 2. Fix dialogs so that they start fresh and null 🏃‍♂️
 10. Remove console logs 🏃‍♂️
 3. Starting upload dialog needs to show image and allow image changes 🏃‍♂️
+13. Keep results here as xlsx and upload to github 🏃‍♂️
 
-13. Keep results here as xlsx and upload to github
 12. Send Abdullahi Data and page link
 6. Predict and about pages
 8. Ensure information is accurate

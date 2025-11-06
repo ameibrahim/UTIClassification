@@ -46,6 +46,30 @@ export default function Home() {
                                 affects the groin area. It can cause extreme
                                 pain when relieving pee through the bladder.
                             </TypographyP>
+                            <TypographyP>
+                                The urinary tract includes the kidneys, ureters,
+                                bladder, and urethra. Bacteria can invade any
+                                part of this system, but most infections begin
+                                in the bladder when microbes travel up the
+                                urethra.
+                            </TypographyP>
+                            <TypographyP>
+                                Common symptoms include burning sensations while
+                                urinating, cloudy or bloody urine, pelvic
+                                cramping, and a frequent urge to urinate even
+                                when little urine is produced. Untreated
+                                infections can spread to the kidneys, leading to
+                                fever, chills, and lower back pain.
+                            </TypographyP>
+                            <TypographyP>
+                                Risk factors include dehydration, sexual
+                                activity, diabetes, pregnancy, catheter use, and
+                                anatomical differences that shorten the urethra.
+                                Early detection plus a targeted antibiotic
+                                regimen typically resolves symptoms quickly, so
+                                prompt screening is encouraged whenever warning
+                                signs appear.
+                            </TypographyP>
                         </div>
 
                         <div className="flex-1 sm:mt-14 rounded-3xl border-10 border-[var(--lime-green)]/40 grid place-items-center">
