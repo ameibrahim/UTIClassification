@@ -17,7 +17,6 @@ const dormantLinkStyle =
 
 const Navbar = () => {
     const path = usePathname();
-    console.log("path: ", path);
 
     return (
         <header className="pointer-events-auto fixed z-13 px-6 w-full">
