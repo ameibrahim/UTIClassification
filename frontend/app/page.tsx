@@ -148,12 +148,6 @@ export default function Home() {
                         <ArrowRight />
                     </Button>
                 </div>
-
-                <div className="w-full grid bg-[var(--dark-lime)] text-xs text-white place-items-center">
-                    <div className="p-4">
-                        Copyrights @ 2025, all rights reserved.
-                    </div>
-                </div>
             </div>
         </div>
     );
