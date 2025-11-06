@@ -132,7 +132,7 @@ export default function Home() {
 
                 <div className="w-full grid bg-[var(--dark-lime)] text-xs text-white place-items-center">
                     <div className="p-4">
-                        Copyrights @2025, all rights reserved.
+                        Copyrights @ 2025, all rights reserved.
                     </div>
                 </div>
             </div>
