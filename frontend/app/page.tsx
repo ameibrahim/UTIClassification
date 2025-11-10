@@ -104,7 +104,7 @@ export default function Home() {
                             </Button>
                             <div className="relative flex-1 rounded-md grid place-items-center border-2 h-35 border-[var(--lime-green)] overflow-hidden">
                                 <Image
-                                    src="/image.jpg"
+                                    src="/images/dialog2.png"
                                     alt=""
                                     height={300}
                                     width={600}
@@ -123,7 +123,7 @@ export default function Home() {
 
                             <div className="relative flex-1 rounded-md grid place-items-center border-2 h-35 border-[var(--lime-green)] overflow-hidden">
                                 <Image
-                                    src="/image.jpg"
+                                    src="/images/dialog3.png"
                                     alt=""
                                     height={300}
                                     width={600}
