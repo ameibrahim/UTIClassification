@@ -8,8 +8,18 @@ import {
 } from "@/components/typography";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 import { usePredictionContext } from "@/context/PredictionContext";
-import { ArrowRight, Brain, Microscope, ShieldCheck, Users } from "lucide-react";
+import {
+    ArrowRight,
+    Brain,
+    CloudDownload,
+    Database,
+    Github,
+    Microscope,
+    ShieldCheck,
+    Users,
+} from "lucide-react";
 
 const pillars = [
     {
@@ -34,6 +44,23 @@ const pillars = [
 
 export default function AboutPage() {
     const { handleSetProcessStatusOn } = usePredictionContext();
+    const resourceLinks = [
+        {
+            label: "Zenodo Dataset",
+            href: "https://zenodo.org/uploads/17449876",
+            icon: Database,
+        },
+        {
+            label: "GitHub Repository",
+            href: "https://github.com/ameibrahim/UTIClassification",
+            icon: Github,
+        },
+        {
+            label: "Google Drive Assets",
+            href: "https://drive.google.com/file/d/1uya9xPwyf2UtO8uLETywclmfBg9BP3AD/view?usp=share_link",
+            icon: CloudDownload,
+        },
+    ];
 
     return (
         <div className="relative min-h-screen bg-white font-sans overflow-hidden">
@@ -103,14 +130,6 @@ export default function AboutPage() {
                                 interface so you can evaluate predictions
                                 without downloading tooling.
                             </TypographyP>
-                            <TypographyP>
-                                Sample images stored in the public folder
-                                provide a quick way to validate the workflow,
-                                but the dialog also accepts your own PNG/JPEG
-                                microscope captures. Larger datasets can be
-                                swapped in via the backend API layer for deeper
-                                experiments.
-                            </TypographyP>
                         </div>
 
                         <div className="rounded-3xl border-10 border-[var(--lime-green)]/40 overflow-hidden">
@@ -133,14 +152,25 @@ export default function AboutPage() {
                         Explore the repository, tweak the training notebooks, or
                         adapt the API to your preferred deployment target.
                     </TypographyP>
-                    <Button
-                        onClick={handleSetProcessStatusOn}
-                        variant={"rounded"}
-                    >
-                        <Brain />
-                        Launch Prediction Dialog
-                        <ArrowRight />
-                    </Button>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        {resourceLinks.map(({ label, href, icon: Icon }) => (
+                            <Button
+                                key={label}
+                                variant={"rounded"}
+                                asChild
+                                className="gap-2"
+                            >
+                                <Link
+                                    href={href}
+                                    target="_blank"
+                                    rel="noreferrer noopener"
+                                >
+                                    <Icon className="size-4" />
+                                    {label}
+                                </Link>
+                            </Button>
+                        ))}
+                    </div>
                 </section>
             </div>
         </div>
