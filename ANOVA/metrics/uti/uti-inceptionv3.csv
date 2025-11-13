@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+uti-inceptionv3-round1,86.81,85.76,0.4307
+uti-inceptionv3-round2,87.32,85.42,0.4271
+uti-inceptionv3-round3,86.77,85.07,0.4284
+uti-inceptionv3-round4,86.71,85.42,0.4485
+uti-inceptionv3-round5,86.78,84.72,0.4547

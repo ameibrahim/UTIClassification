@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+unu-vgg19-round1,96.23,98.04,0.1140
+unu-vgg19-round2,96.08,96.08,0.1650
+unu-vgg19-round3,96.23,98.04,0.0570
+unu-vgg19-round4,96.15,97.06,0.1457
+unu-vgg19-round5,96.23,98.04,0.1373

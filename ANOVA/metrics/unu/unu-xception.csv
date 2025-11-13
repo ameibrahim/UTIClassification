@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+unu-xception-round1,94.44,97.06,0.1143
+unu-xception-round2,92.73,96.08,0.1289
+unu-xception-round3,94.44,97.06,0.1286
+unu-xception-round4,94.44,97.06,0.1337
+unu-xception-round5,94.44,97.06,0.1522

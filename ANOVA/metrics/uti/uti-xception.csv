@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+uti-xception-round1,91.21,90.62,0.2883
+uti-xception-round2,92.66,91.67,0.3120
+uti-xception-round3,91.80,89.93,0.3180
+uti-xception-round4,91.69,90.62,0.2942
+uti-xception-round5,93.50,92.36,0.2966

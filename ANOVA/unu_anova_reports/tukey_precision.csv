@@ -1,0 +1,16 @@
+group1,group2,meandiff,p-adj,lower,upper,reject
+unu-inceptionresnetv2,unu-inceptionv3,-8.32,0.0002,-13.0972,-3.5428,True
+unu-inceptionresnetv2,unu-resnet101v2,1.19,0.97,-3.5872,5.9672,False
+unu-inceptionresnetv2,unu-resnet50v2,-1.674,0.8832,-6.4512,3.1032,False
+unu-inceptionresnetv2,unu-vgg19,3.856,0.165,-0.9212,8.6332,False
+unu-inceptionresnetv2,unu-xception,1.77,0.8573,-3.0072,6.5472,False
+unu-inceptionv3,unu-resnet101v2,9.51,0.0,4.7328,14.2872,True
+unu-inceptionv3,unu-resnet50v2,6.646,0.003,1.8688,11.4232,True
+unu-inceptionv3,unu-vgg19,12.176,0.0,7.3988,16.9532,True
+unu-inceptionv3,unu-xception,10.09,0.0,5.3128,14.8672,True
+unu-resnet101v2,unu-resnet50v2,-2.864,0.4527,-7.6412,1.9132,False
+unu-resnet101v2,unu-vgg19,2.666,0.5292,-2.1112,7.4432,False
+unu-resnet101v2,unu-xception,0.58,0.9989,-4.1972,5.3572,False
+unu-resnet50v2,unu-vgg19,5.53,0.0168,0.7528,10.3072,True
+unu-resnet50v2,unu-xception,3.444,0.2616,-1.3332,8.2212,False
+unu-vgg19,unu-xception,-2.086,0.7549,-6.8632,2.6912,False

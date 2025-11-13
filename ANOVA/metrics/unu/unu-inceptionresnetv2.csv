@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+unu-inceptionresnetv2-round1,92.59,95.10,0.1538
+unu-inceptionresnetv2-round2,94.34,96.08,0.1930
+unu-inceptionresnetv2-round3,92.73,96.08,0.1685
+unu-inceptionresnetv2-round4,90.91,94.12,0.1777
+unu-inceptionresnetv2-round5,91.07,95.10,0.1492

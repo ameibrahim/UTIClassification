@@ -1,0 +1,16 @@
+group1,group2,meandiff,p-adj,lower,upper,reject
+uti-inceptionresnetv2,uti-inceptionv3,-3.418,0.0148,-6.3273,-0.5087,True
+uti-inceptionresnetv2,uti-resnet101v2,-0.98,0.899,-3.8893,1.9293,False
+uti-inceptionresnetv2,uti-resnet50v2,-1.756,0.4454,-4.6653,1.1533,False
+uti-inceptionresnetv2,uti-vgg19,5.266,0.0001,2.3567,8.1753,True
+uti-inceptionresnetv2,uti-xception,1.876,0.3746,-1.0333,4.7853,False
+uti-inceptionv3,uti-resnet101v2,2.438,0.1382,-0.4713,5.3473,False
+uti-inceptionv3,uti-resnet50v2,1.662,0.5045,-1.2473,4.5713,False
+uti-inceptionv3,uti-vgg19,8.684,0.0,5.7747,11.5933,True
+uti-inceptionv3,uti-xception,5.294,0.0001,2.3847,8.2033,True
+uti-resnet101v2,uti-resnet50v2,-0.776,0.96,-3.6853,2.1333,False
+uti-resnet101v2,uti-vgg19,6.246,0.0,3.3367,9.1553,True
+uti-resnet101v2,uti-xception,2.856,0.0564,-0.0533,5.7653,False
+uti-resnet50v2,uti-vgg19,7.022,0.0,4.1127,9.9313,True
+uti-resnet50v2,uti-xception,3.632,0.0087,0.7227,6.5413,True
+uti-vgg19,uti-xception,-3.39,0.0159,-6.2993,-0.4807,True
