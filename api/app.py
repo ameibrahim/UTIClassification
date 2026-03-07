@@ -12,6 +12,7 @@ from prediction import (
     load_image_from_url,       # keep if you still want URL fallback
     predict_with_model_file,
 )
+from model_store import ensure_model_available
 
 MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "./models"))
 
@@ -87,14 +88,17 @@ async def post_results(
             logger.info("Fetching image from URL: %s", imageUrl)
             img = load_image_from_url(imageUrl)  # your existing helper
 
-        # Resolve model
-        model_path = MODELS_DIR / modelFilename
+        # Resolve model (download if missing)
+        model_path = ensure_model_available(modelFilename, MODELS_DIR)
         logger.info("Using model file: %s", model_path)
 
         # Run prediction
         result = predict_with_model_file(img, model_path, modelInputFeatureSize)
         return {"classification": result}
 
+    except FileNotFoundError as exc:
+        logger.error("Model not found: %s", exc)
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         logger.error("Validation error: %s", exc)
         raise HTTPException(status_code=400, detail=str(exc)) from exc

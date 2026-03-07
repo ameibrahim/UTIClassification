@@ -12,6 +12,9 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
+RUN chmod +x /app/entrypoint.sh
+
 EXPOSE 7135
 
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "app:application", "--host", "0.0.0.0", "--port", "7135"]
