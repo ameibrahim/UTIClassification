@@ -473,17 +473,28 @@ function ResultsDialog() {
                     Multi Classification
                 </div>
 
-                <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
-                    {classCounts && classCounts.length > 1 && CELL_ORDER.map((key, index) => (
-                        <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
-                            <ResultListItem
-                                title={getMulticlassLabel(key)}
-                                value={classCounts[key]}
-                            />
-                            {index !== CELL_ORDER.length - 1 && <Separator />}
-                        </div>
-                    ))}
-                </div>
+                {classCounts.length > 1 && (
+                    <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
+                        {CELL_ORDER.map((key, index) => (
+                            <React.Fragment key={key}>
+                                <ResultListItem
+                                    title={getMulticlassLabel(key)}
+                                    value={classCounts[key]}
+                                />
+                                {index !== CELL_ORDER.length - 1 && (
+                                    <Separator />
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </div>
+                )}
+
+                {classCounts.length == 0 && (
+                    <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
+                        Nothing to show
+                    </div>
+                )}
+                
             </div>
         );
     };
