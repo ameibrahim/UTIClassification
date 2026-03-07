@@ -415,7 +415,7 @@ function ResultsDialog() {
             return null;
 
         return (
-            <div className="p-4 w-full grid place-items-center">
+            <div className="p-4 w-full grid place-items-center gap-3">
                 <Item variant="default" className="gap-3">
                     <ItemMedia>
                         <Spinner className="text-[var(--dark-lime)]" />
@@ -428,14 +428,13 @@ function ResultsDialog() {
                             speed={5}
                             color="text-[var(--dark-lime)]"
                         />
-
-                        {totalCells > 0 && (
-                            <div className="text-xs opacity-70">
-                                {processedCells} / {totalCells} cells analyzed
-                            </div>
-                        )}
                     </ItemContent>
                 </Item>
+                {totalCells > 0 && (
+                    <div className="text-xs opacity-70">
+                        {processedCells} / {totalCells} cells analyzed
+                    </div>
+                )}
             </div>
         );
     };
@@ -453,8 +452,8 @@ function ResultsDialog() {
                     {cellPredictions.map((prediction, index) => {
                         const classKey =
                             prediction.data?.prediction.class ?? "Unknown";
-                        const confidence = prediction.data?.prediction
-                            .confidence;
+                        const confidence =
+                            prediction.data?.prediction.confidence;
                         const confidenceText =
                             typeof confidence === "number"
                                 ? turnIntoPercentage(confidence)
@@ -539,6 +538,7 @@ function ResultsDialog() {
                     {renderDeepClassificationSpinner()}
                     {renderUTIClassification()}
                     {renderMultiClassificationSpinner()}
+                    {renderMultiClassification()}
 
                     <div className="w-full items-end font-bold text-xs flex justify-between mt-2">
                         <div>
