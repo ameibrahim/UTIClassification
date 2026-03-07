@@ -439,8 +439,33 @@ function ResultsDialog() {
         );
     };
 
+    const CELL_ORDER = [
+        "leuko",
+        "eryth",
+        "mycete",
+        "cast",
+        "cryst",
+        "epith",
+        "epithn",
+    ];
+
     const renderMultiClassification = () => {
-        if (cellPredictions.length === 0) return null;
+        if (!cellPredictions) return null;
+
+        const classCounts = CELL_ORDER.reduce(
+            (acc, key) => {
+                acc[key] = 0;
+                return acc;
+            },
+            {} as Record<string, number>
+        );
+
+        cellPredictions.forEach((prediction) => {
+            const key = prediction.prediction.class;
+            if (classCounts[key] !== undefined) {
+                classCounts[key] += 1;
+            }
+        });
 
         return (
             <div>
@@ -449,29 +474,15 @@ function ResultsDialog() {
                 </div>
 
                 <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
-                    {cellPredictions.map((prediction, index) => {
-                        const classKey = prediction.prediction.class;
-                        const confidence = prediction.prediction.confidence;
-                        const confidenceText =
-                            typeof confidence === "number"
-                                ? turnIntoPercentage(confidence)
-                                : "N/A";
-
-                        return (
-                            <div
-                                key={prediction.crop_id ?? index}
-                                className="w-full"
-                            >
-                                <ResultListItem
-                                    title={getMulticlassLabel(classKey)}
-                                    value={confidenceText}
-                                />
-                                {index !== cellPredictions.length - 1 && (
-                                    <Separator />
-                                )}
-                            </div>
-                        );
-                    })}
+                    {CELL_ORDER.map((key, index) => (
+                        <div key={key} className="w-full">
+                            <ResultListItem
+                                title={getMulticlassLabel(key)}
+                                value={classCounts[key]}
+                            />
+                            {index !== CELL_ORDER.length - 1 && <Separator />}
+                        </div>
+                    ))}
                 </div>
             </div>
         );
