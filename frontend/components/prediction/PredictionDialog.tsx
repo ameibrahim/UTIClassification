@@ -415,7 +415,7 @@ function ResultsDialog() {
             return null;
 
         return (
-            <div className="p-4 w-full grid place-items-center gap-3">
+            <div className="w-full grid place-items-center gap-1">
                 <Item variant="default" className="gap-3">
                     <ItemMedia>
                         <Spinner className="text-[var(--dark-lime)]" />
@@ -574,7 +574,7 @@ function ResultsDialog() {
                         </div>
 
                         {renderMultiClassificationSpinner()}
-                        
+
                         <Button
                             onClick={handleSetProcessStatusOff}
                             variant={"rounded"}
