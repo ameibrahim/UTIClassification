@@ -473,7 +473,7 @@ function ResultsDialog() {
                     Multi Classification
                 </div>
 
-                {classCounts.length > 1 && (
+                {
                     <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
                         {CELL_ORDER.map((key, index) => (
                             <React.Fragment key={key}>
@@ -487,14 +487,13 @@ function ResultsDialog() {
                             </React.Fragment>
                         ))}
                     </div>
-                )}
+                }
 
-                {classCounts.length == 0 && (
+                {/* {classCounts.length == 0 && (
                     <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
                         Nothing to show
                     </div>
-                )}
-                
+                )} */}
             </div>
         );
     };
