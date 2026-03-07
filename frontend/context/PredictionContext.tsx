@@ -85,7 +85,7 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     const [processStatus, setProcessStatus] =
         useState<ProcessStatusType>("off");
     const [unuModelFileNameState, setUNUModelFileNameState] = useState<string>(
-        "UNU_Xception_Round1.keras"
+        "UNU_ResNet101V2_Round5.keras"
     );
     const [utiModelFileNameState, setUTIModelFileNameState] = useState<string>(
         "UTI_VGG19_Round4.keras"
@@ -112,7 +112,7 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         setProcessStatus("off");
-        setImage(undefined)
+        setImage(undefined);
     }, []);
 
     useLayoutEffect(() => {
@@ -123,7 +123,9 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
 
         if (unuInferenceStart != null) {
             const tick = () =>
-                setUNUDisplayMs(Math.max(0, performance.now() - unuInferenceStart));
+                setUNUDisplayMs(
+                    Math.max(0, performance.now() - unuInferenceStart)
+                );
             tick();
             const id = window.setInterval(tick, 100);
             return () => window.clearInterval(id);
@@ -140,7 +142,9 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
 
         if (utiInferenceStart != null) {
             const tick = () =>
-                setUTIDisplayMs(Math.max(0, performance.now() - utiInferenceStart));
+                setUTIDisplayMs(
+                    Math.max(0, performance.now() - utiInferenceStart)
+                );
             tick();
             const id = window.setInterval(tick, 100);
             return () => window.clearInterval(id);
@@ -286,7 +290,8 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
                         );
                     }
 
-                    const parsed = (await response.json()) as PredictionResponse;
+                    const parsed =
+                        (await response.json()) as PredictionResponse;
                     setDuration(performance.now() - startedAt);
                     return parsed;
                 } catch (err) {
