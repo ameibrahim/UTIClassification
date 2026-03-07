@@ -4,7 +4,7 @@ services:
       context: api/
       dockerfile: Dockerfile
     container_name: uti-api
-    command: uvicorn app:application --host 0.0.0.0 --port 7135 --reload
+    command: uvicorn app:app --host 0.0.0.0 --port 7135 --reload
     ports:
       - "7135:7135"
     volumes:

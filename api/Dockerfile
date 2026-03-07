@@ -19,4 +19,4 @@ EXPOSE 7135
 
 ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
-CMD ["uvicorn", "app:application", "--host", "0.0.0.0", "--port", "7135"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7135"]

@@ -19,11 +19,14 @@ MODELS_DIR  = Path(os.getenv("MODELS_DIR",  "./models"))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-application = FastAPI()
+app = FastAPI()
 
-application.add_middleware(
+app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://uticlassification.app",
+        "https://www.uticlassification.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,7 +39,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         logger.info("Response: %s", response.status_code)
         return response
 
-application.add_middleware(LoggingMiddleware)
+app.add_middleware(LoggingMiddleware)
 
 def _pil_from_upload(upload: UploadFile) -> Image.Image:
     # Basic content-type guard (optional)
@@ -53,11 +56,11 @@ def _pil_from_upload(upload: UploadFile) -> Image.Image:
     except Exception as exc:
         raise ValueError(f"Unable to decode uploaded image: {exc}") from exc
 
-@application.get("/health")
+@app.get("/health")
 def health():
     return {"ok": True}
 
-@application.post("/predict/")
+@app.post("/predict/")
 async def post_results(
     modelInputFeatureSize: int = Form(...),
     modelFilename: str = Form(...),
@@ -108,4 +111,4 @@ async def post_results(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(application, host="0.0.0.0", port=7135)
+    uvicorn.run(app, host="0.0.0.0", port=7135)
