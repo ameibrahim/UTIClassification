@@ -85,7 +85,7 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     const [processStatus, setProcessStatus] =
         useState<ProcessStatusType>("off");
     const [unuModelFileNameState, setUNUModelFileNameState] = useState<string>(
-        "UNU_ResNet101V2_Round5.keras"
+        "UNU_Xception_Round1.keras"
     );
     const [utiModelFileNameState, setUTIModelFileNameState] = useState<string>(
         "UTI_VGG19_Round4.keras"
