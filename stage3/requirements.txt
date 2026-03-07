@@ -15,4 +15,5 @@ uvicorn[standard]
 keras
 requests
 huggingface-hub
+ultralytics
 

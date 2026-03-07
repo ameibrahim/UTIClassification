@@ -20,7 +20,11 @@ export type ProcessStatusType =
     | "predictinguti"
     | "error"
     | "results"
-    | "off";
+    | "off"
+    | "idle"
+    | "detectingcells"
+    | "finished";
+
 export const ProcessStatusValues = {
     upload: "upload",
     predicting: "predicting",
@@ -38,6 +42,17 @@ type PredictionResponse = {
         [key: string]: unknown;
     };
     [key: string]: unknown;
+};
+
+type CellPredictionResponse = {
+    type: string;
+    data?: {
+        crop_id: number | string;
+        prediction: {
+            class: string;
+            confidence: number;
+        };
+    };
 };
 
 type PredictionContextValue = {
@@ -62,6 +77,12 @@ type PredictionContextValue = {
     handleRetryPrediction: () => Promise<void>;
     handleSetProcessStatusOff: () => void;
     handleSetProcessStatusOn: () => void;
+    cellPredictions: CellPredictionResponse[];
+    totalCells: number;
+    processedCells: number;
+    cellInferenceStart: number | null;
+    cellInferenceDuration: number | null;
+    cellProcessStatus: ProcessStatusType;
 };
 
 const PredictionContext = React.createContext<PredictionContextValue | null>(
@@ -85,7 +106,7 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     const [processStatus, setProcessStatus] =
         useState<ProcessStatusType>("off");
     const [unuModelFileNameState, setUNUModelFileNameState] = useState<string>(
-        "UNU_ResNet101V2_Round5.keras"
+        "UNU_VGG19_Round2.keras"
     );
     const [utiModelFileNameState, setUTIModelFileNameState] = useState<string>(
         "UTI_VGG19_Round4.keras"
@@ -109,6 +130,22 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
     const abortControllerRef = useRef<AbortController | null>(null);
     const [unuDisplayMs, setUNUDisplayMs] = useState<number | null>(null);
     const [utiDisplayMs, setUTIDisplayMs] = useState<number | null>(null);
+
+    const [cellPredictions, setCellPredictions] = useState<
+        CellPredictionResponse[]
+    >([]);
+    const [totalCells, setTotalCells] = useState<number>(0);
+    const [processedCells, setProcessedCells] = useState<number>(0);
+
+    const [cellProcessStatus, setCellProcessStatus] =
+        useState<ProcessStatusType>("idle");
+
+    const [cellInferenceStart, setCellInferenceStart] = useState<number | null>(
+        null
+    );
+    const [cellInferenceDuration, setCellInferenceDuration] = useState<
+        number | null
+    >(null);
 
     useEffect(() => {
         setProcessStatus("off");
@@ -314,12 +351,16 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             if (predictedClass === 1) {
                 toast.success("Image is UTI, running deeper classification");
                 setProcessStatus("predictinguti");
+
                 const utiResult = await sendPrediction(
                     utiModelFileNameState,
                     setUTIInferenceStart,
                     setUTIInferenceDuration
                 );
+
                 setUTIPredictionResult(utiResult);
+
+                startCellAnalysis(image);
             } else {
                 setUTIPredictionResult(null);
                 setUTIInferenceStart(null);
@@ -345,6 +386,57 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
         handlePredictionError,
         handlePredictionSuccess,
     ]);
+
+    const startCellAnalysis = async (image: File) => {
+        setCellProcessStatus("detectingcells");
+
+        const startTime = performance.now();
+        setCellInferenceStart(startTime);
+
+        const formData = new FormData();
+        formData.append("image", image);
+
+        // STEP 1 — start job
+        const response = await fetch(
+            "https://stage3.api.uticlassification.app/analyze",
+            {
+                method: "POST",
+                body: formData,
+            }
+        );
+
+        const { job_id, num_crops } = await response.json();
+
+        setTotalCells(num_crops);
+        setProcessedCells(0);
+
+        // STEP 2 — websocket
+        const ws = new WebSocket(
+            `wss://stage3.api.uticlassification.app/ws/${job_id}`
+        );
+
+        const cellResults: any[] = [];
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+
+            if (message.type === "prediction") {
+                cellResults.push(message.data);
+
+                setProcessedCells((prev) => prev + 1);
+
+                setCellPredictions([...cellResults]);
+            }
+
+            if (message.type === "finished") {
+                ws.close();
+
+                setCellInferenceDuration(performance.now() - startTime);
+
+                setCellProcessStatus("finished");
+            }
+        };
+    };
 
     const handleRetryPrediction = useCallback(async () => {
         toast.error("Retrying Prediction");
@@ -374,6 +466,12 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             handleRetryPrediction,
             handleSetProcessStatusOff,
             handleSetProcessStatusOn,
+            cellPredictions,
+            totalCells,
+            processedCells,
+            cellInferenceStart,
+            cellInferenceDuration,
+            cellProcessStatus,
         }),
         [
             handlePredictingImageChange,
@@ -395,6 +493,12 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             handleRetryPrediction,
             handleSetProcessStatusOff,
             handleSetProcessStatusOn,
+            cellPredictions,
+            totalCells,
+            processedCells,
+            cellInferenceStart,
+            cellInferenceDuration,
+            cellProcessStatus,
         ]
     );
 

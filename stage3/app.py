@@ -5,6 +5,16 @@ from PIL import Image
 import asyncio
 import io
 import random
+from ultralytics import YOLO
+from tensorflow.keras.models import load_model
+import numpy as np
+
+# Load models once
+yolo_model = YOLO("models/celldetector-yolov11.pt")
+cnn_model = load_model("models/MULTICLASS_InceptionV3_Round3.keras")
+
+CLASS_NAMES = ["leuko","eryth","mycete","cast","cryst","epith","epithn"]
+CNN_SIZE = 224
 
 app = FastAPI()
 
@@ -25,8 +35,7 @@ connections = {}
 @app.post("/analyze")
 async def analyze(image: UploadFile = File(...)):
 
-    # job_id = str(uuid4())
-    job_id = "12345"
+    job_id = str(uuid4())
 
     contents = await image.read()
     image = Image.open(io.BytesIO(contents)).convert("RGB")
@@ -94,30 +103,41 @@ async def process_crops(job_id, crops):
 
 def split_image(image):
     """
-    Example splitter.
-    Replace this with Roboflow bounding box crops.
+    Run YOLO detection and return cropped cells
     """
 
-    width, height = image.size
+    results = yolo_model(image)
+
     crops = []
 
-    step = width // 4
+    for result in results:
 
-    for i in range(4):
-        crop = image.crop((i * step, 0, (i + 1) * step, height))
-        crops.append(crop)
+        boxes = result.boxes.xyxy.cpu().numpy()
+
+        for box in boxes:
+            x1, y1, x2, y2 = map(int, box)
+
+            crop = image.crop((x1, y1, x2, y2))
+            crops.append(crop)
 
     return crops
 
 
 def classify_crop(crop):
-    """
-    Replace with your trained model prediction.
-    """
 
-    classes = ["RBC", "Pus", "Fungi", "Epithelial"]
-    return random.choice(classes)
+    img = crop.resize((CNN_SIZE, CNN_SIZE))
+    arr = np.array(img) / 255.0
+    arr = np.expand_dims(arr, axis=0)
 
+    preds = cnn_model.predict(arr, verbose=0)
+
+    class_id = int(np.argmax(preds[0]))
+    confidence = float(preds[0][class_id])
+
+    return {
+        "class": CLASS_NAMES[class_id],
+        "confidence": round(confidence, 4)
+    }
 
 if __name__ == "__main__":
     import uvicorn

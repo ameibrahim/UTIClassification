@@ -31,6 +31,20 @@ import {
 } from "@/context/PredictionContext";
 import { Separator } from "../ui/separator";
 
+const MULTICLASS_LABELS = {
+    leuko: "Leukocytes",
+    eryth: "Erythrocytes",
+    mycete: "Fungi",
+    cast: "Casts",
+    cryst: "Crystals",
+    epith: "Epithelial Cells",
+    epithn: "Renal Epithelial Cells",
+};
+
+function getMulticlassLabel(key: string): string {
+    return MULTICLASS_LABELS[key as keyof typeof MULTICLASS_LABELS] ?? key;
+}
+
 export default function PredictionDialogSet() {
     // These are all controlled by a context
     // to be able to pass data around efficiently
@@ -92,7 +106,9 @@ function UploadDialog() {
                                         width={200}
                                         className="object-contain rounded-md"
                                     />
-                                    <div className="text-xs max-w-md">{image?.name}</div>
+                                    <div className="text-xs max-w-md">
+                                        {image?.name}
+                                    </div>
                                 </div>
                             )}
 
@@ -312,6 +328,10 @@ function ResultsDialog() {
         utiModelFileName,
         unuDisplayMs,
         utiDisplayMs,
+        cellProcessStatus,
+        cellPredictions,
+        totalCells,
+        processedCells,
     } = usePredictionContext();
 
     const renderBinaryClassification = () => {
@@ -387,6 +407,79 @@ function ResultsDialog() {
         );
     };
 
+    const renderMultiClassificationSpinner = () => {
+        if (
+            unuPredictionResult?.classification?.predicted_class === "0" ||
+            cellProcessStatus == "finished"
+        )
+            return null;
+
+        return (
+            <div className="p-4 w-full grid place-items-center">
+                <Item variant="default" className="gap-3">
+                    <ItemMedia>
+                        <Spinner className="text-[var(--dark-lime)]" />
+                    </ItemMedia>
+
+                    <ItemContent className="flex flex-col gap-1">
+                        <ShinyText
+                            text="Performing Multi Classification..."
+                            disabled={false}
+                            speed={5}
+                            color="text-[var(--dark-lime)]"
+                        />
+
+                        {totalCells > 0 && (
+                            <div className="text-xs opacity-70">
+                                {processedCells} / {totalCells} cells analyzed
+                            </div>
+                        )}
+                    </ItemContent>
+                </Item>
+            </div>
+        );
+    };
+
+    const renderMultiClassification = () => {
+        if (cellPredictions.length === 0) return null;
+
+        return (
+            <div>
+                <div className="text-xs underline underline-offset-4 mb-4 font-medium text-[var(--dark-lime)]">
+                    Multi Classification
+                </div>
+
+                <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
+                    {cellPredictions.map((prediction, index) => {
+                        const classKey =
+                            prediction.data?.prediction.class ?? "Unknown";
+                        const confidence = prediction.data?.prediction
+                            .confidence;
+                        const confidenceText =
+                            typeof confidence === "number"
+                                ? turnIntoPercentage(confidence)
+                                : "N/A";
+
+                        return (
+                            <div
+                                key={prediction.data?.crop_id ?? index}
+                                className="w-full"
+                            >
+                                <ResultListItem
+                                    title={getMulticlassLabel(classKey)}
+                                    value={confidenceText}
+                                />
+                                {index !== cellPredictions.length - 1 && (
+                                    <Separator />
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
     const renderUTIClassification = () => {
         if (!utiPredictionResult) return null;
 
@@ -445,6 +538,7 @@ function ResultsDialog() {
                     {renderBinaryClassification()}
                     {renderDeepClassificationSpinner()}
                     {renderUTIClassification()}
+                    {renderMultiClassificationSpinner()}
 
                     <div className="w-full items-end font-bold text-xs flex justify-between mt-2">
                         <div>

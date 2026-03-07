@@ -1,14 +1,10 @@
 [
   {
-    "filename": "UNU_Xception_Round1.keras",
-    "url": "https://huggingface.co/ibrahimame13/UNU/resolve/main/UNU_Xception_Round1.keras"
+    "filename": "celldetector-yolov11.pt",
+    "url": "https://huggingface.co/ibrahimame13/UNU/resolve/main/celldetector-yolov11.pt"
   },
   {
-    "filename": "UNU_ResNet101V2_Round5.keras",
-    "url": "https://huggingface.co/ibrahimame13/UNU/resolve/main/UNU_ResNet101V2_Round5.keras"
-  },
-  {
-    "filename": "UTI_VGG19_Round4.keras",
-    "url": "https://huggingface.co/ibrahimame13/UNU/resolve/main/UTI_VGG19_Round4.keras"
+    "filename": "MULTICLASS_InceptionV3_Round3.keras",
+    "url": "https://huggingface.co/ibrahimame13/UNU/resolve/main/MULTICLASS_InceptionV3_Round3.keras"
   }
 ]
