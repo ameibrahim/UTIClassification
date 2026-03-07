@@ -474,8 +474,8 @@ function ResultsDialog() {
                 </div>
 
                 <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
-                    {CELL_ORDER.map((key, index) => (
-                        <div key={key} className="w-full">
+                    {classCounts && classCounts.length > 1 && CELL_ORDER.map((key, index) => (
+                        <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
                             <ResultListItem
                                 title={getMulticlassLabel(key)}
                                 value={classCounts[key]}
