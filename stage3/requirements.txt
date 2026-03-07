@@ -6,14 +6,10 @@ scikit-image
 scikit-learn
 joblib
 fastapi
-uvicorn
-flask
-flask_cors
-requests
 python-multipart
 uvicorn[standard]
-keras
 requests
 huggingface-hub
 ultralytics
+opencv-python-headless
 
