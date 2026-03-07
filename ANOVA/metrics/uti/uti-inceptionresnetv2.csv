@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+uti-inceptionresnetv2-round1,90.94,89.93,0.3381
+uti-inceptionresnetv2-round2,91.48,90.62,0.2960
+uti-inceptionresnetv2-round3,88.29,87.50,0.3544
+uti-inceptionresnetv2-round4,90.58,89.58,0.3334
+uti-inceptionresnetv2-round5,90.19,89.24,0.3484

@@ -1,0 +1,9 @@
+,precision,precision,accuracy,accuracy,loss,loss
+,mean,std,mean,std,mean,std
+architecture,,,,,,
+unu-inceptionresnetv2,92.328,1.403,95.296,0.82,0.168,0.018
+unu-inceptionv3,84.008,2.525,89.806,1.914,0.251,0.036
+unu-resnet101v2,93.518,4.439,95.688,2.256,0.123,0.022
+unu-resnet50v2,90.654,2.678,93.924,1.454,0.189,0.04
+unu-vgg19,96.184,0.068,97.452,0.877,0.124,0.042
+unu-xception,94.098,0.765,96.864,0.438,0.132,0.014

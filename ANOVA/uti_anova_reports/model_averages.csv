@@ -1,0 +1,9 @@
+,precision,precision,accuracy,accuracy,loss,loss
+,mean,std,mean,std,mean,std
+architecture,,,,,,
+uti-inceptionresnetv2,90.296,1.218,89.374,1.166,0.334,0.023
+uti-inceptionv3,86.878,0.25,85.278,0.396,0.438,0.013
+uti-resnet101v2,89.316,1.256,87.5,1.667,0.395,0.032
+uti-resnet50v2,88.54,1.52,86.668,1.658,0.427,0.025
+uti-vgg19,95.562,2.65,94.656,3.933,0.173,0.148
+uti-xception,92.172,0.908,91.04,0.965,0.302,0.013

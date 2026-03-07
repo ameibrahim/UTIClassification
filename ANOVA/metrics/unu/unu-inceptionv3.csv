@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+unu-inceptionv3-round1,85.00,91.18,0.2849
+unu-inceptionv3-round2,80.95,88.24,0.2856
+unu-inceptionv3-round3,81.67,87.25,0.2561
+unu-inceptionv3-round4,86.21,91.18,0.2066
+unu-inceptionv3-round5,86.21,91.18,0.2219

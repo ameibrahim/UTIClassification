@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+uti-resnet101v2-round1,90.89,89.24,0.3381
+uti-resnet101v2-round2,87.98,85.07,0.4015
+uti-resnet101v2-round3,88.79,87.15,0.4095
+uti-resnet101v2-round4,88.53,87.15,0.4095
+uti-resnet101v2-round5,90.39,88.89,0.4173

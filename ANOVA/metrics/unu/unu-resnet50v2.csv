@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+unu-resnet50v2-round1,92.45,94.12,0.1911
+unu-resnet50v2-round2,94.34,96.08,0.1286
+unu-resnet50v2-round3,87.72,92.16,0.1817
+unu-resnet50v2-round4,89.47,94.12,0.2391
+unu-resnet50v2-round5,89.29,93.14,0.2069

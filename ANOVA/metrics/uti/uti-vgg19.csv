@@ -1,0 +1,6 @@
+model,precision,accuracy,loss
+uti-vgg19-round1,95.80,95.49,0.1148
+uti-vgg19-round2,91.09,87.85,0.4316
+uti-vgg19-round3,96.02,95.49,0.1514
+uti-vgg19-round4,98.04,97.92,0.0705
+uti-vgg19-round5,96.86,96.53,0.0951
