@@ -450,10 +450,8 @@ function ResultsDialog() {
 
                 <div className="grid justify-items-start border-1 sm:py-1 sm:p-0 p-3 sm:gap-0 gap-1 rounded-md">
                     {cellPredictions.map((prediction, index) => {
-                        const classKey =
-                            prediction.data?.prediction.class ?? "Unknown";
-                        const confidence =
-                            prediction.data?.prediction.confidence;
+                        const classKey = prediction.prediction.class;
+                        const confidence = prediction.prediction.confidence;
                         const confidenceText =
                             typeof confidence === "number"
                                 ? turnIntoPercentage(confidence)
@@ -461,7 +459,7 @@ function ResultsDialog() {
 
                         return (
                             <div
-                                key={prediction.data?.crop_id ?? index}
+                                key={prediction.crop_id ?? index}
                                 className="w-full"
                             >
                                 <ResultListItem

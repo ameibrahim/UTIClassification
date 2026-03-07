@@ -45,13 +45,10 @@ type PredictionResponse = {
 };
 
 type CellPredictionResponse = {
-    type: string;
-    data?: {
-        crop_id: number | string;
-        prediction: {
-            class: string;
-            confidence: number;
-        };
+    crop_id: number | string;
+    prediction: {
+        class: string;
+        confidence: number;
     };
 };
 
@@ -389,6 +386,8 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
 
     const startCellAnalysis = async (image: File) => {
         setCellProcessStatus("detectingcells");
+        setCellPredictions([]);
+        setCellInferenceDuration(null);
 
         const startTime = performance.now();
         setCellInferenceStart(startTime);
@@ -415,17 +414,18 @@ export function PredictionProvider({ children }: { children: ReactNode }) {
             `wss://stage3.api.uticlassification.app/ws/${job_id}`
         );
 
-        const cellResults: any[] = [];
-
         ws.onmessage = (event) => {
-            const message = JSON.parse(event.data);
+            const message = JSON.parse(event.data) as {
+                type?: string;
+                data?: CellPredictionResponse;
+            };
 
-            if (message.type === "prediction") {
-                cellResults.push(message.data);
+            if (message.type === "prediction" && message.data) {
+                console.log("Received cell prediction:", message.data);
 
                 setProcessedCells((prev) => prev + 1);
 
-                setCellPredictions([...cellResults]);
+                setCellPredictions((prev) => [...prev, message.data!]);
             }
 
             if (message.type === "finished") {
