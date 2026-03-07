@@ -556,7 +556,6 @@ function ResultsDialog() {
                     {renderBinaryClassification()}
                     {renderDeepClassificationSpinner()}
                     {renderUTIClassification()}
-                    {renderMultiClassificationSpinner()}
                     {renderMultiClassification()}
 
                     <div className="w-full items-end font-bold text-xs flex justify-between mt-2">
@@ -573,6 +572,9 @@ function ResultsDialog() {
                                 />
                             )}
                         </div>
+
+                        {renderMultiClassificationSpinner()}
+                        
                         <Button
                             onClick={handleSetProcessStatusOff}
                             variant={"rounded"}
